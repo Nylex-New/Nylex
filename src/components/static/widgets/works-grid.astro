@@ -1,0 +1,105 @@
+---
+import worksData from "@/data/works.json";
+import { ArrowUpRight } from "lucide-react";
+
+interface Props {
+  works?: typeof worksData;
+}
+
+const { works = worksData } = Astro.props;
+---
+
+<div id="works-stack-container" class="relative w-full flex flex-col gap-12 md:gap-16 my-4 pb-20">
+  {works.map((work, idx) => (
+    <div
+      class="work-stack-card sticky top-20 sm:top-24 md:top-28 w-full max-w-6xl mx-auto p-4 sm:p-6 md:p-8 bg-transparent border-none overflow-hidden transition-transform will-change-transform"
+      style={`z-index: ${10 + idx};`}
+      data-card-index={idx}
+    >
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+        <!-- 1. Wide Project Photo (Expanded Width, Full Left-to-Right Website View, Zero Left/Right Cut-Off) -->
+        <div class="lg:col-span-7 w-full flex justify-center lg:justify-start">
+          <a
+            href={work.website}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="block w-full max-w-[620px] aspect-[16/9] sm:aspect-[21/10] overflow-hidden bg-neutral-100 relative group cursor-pointer border border-neutral-200/70 shadow-xs"
+          >
+            <img
+              src={work.img}
+              alt={work.title}
+              class="w-full h-full object-cover object-top group-hover:scale-[1.03] transition-transform duration-700 ease-out"
+              loading="lazy"
+            />
+          </a>
+        </div>
+
+        <!-- 2. Name & 3. Description & 4. Link Button (Compact, Fits in Single Screen, Transparent Card) -->
+        <div class="lg:col-span-5 flex flex-col justify-center gap-3 sm:gap-4 md:gap-5">
+          <!-- Counter Badge -->
+          <div class="flex items-center gap-2.5 font-mono text-xs text-neutral-500 uppercase tracking-widest">
+            <span>PROJECT 0{idx + 1} / 0{works.length}</span>
+            <span class="w-1.5 h-1.5 rounded-full bg-[#0052FF]"></span>
+            <span>{work.category}</span>
+          </div>
+
+          <!-- Project Name -->
+          <h3 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold uppercase tracking-tight leading-tight text-neutral-950">
+            {work.title}
+          </h3>
+
+          <!-- Project Description -->
+          <p class="text-sm sm:text-base text-neutral-600 font-light leading-relaxed max-w-lg">
+            {work.description}
+          </p>
+
+          <!-- Link Button -->
+          <div class="pt-2 sm:pt-3">
+            <a
+              href={work.website}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#0052FF] hover:bg-[#2563EB] text-white font-mono text-xs uppercase tracking-widest transition-all w-fit shadow-xs"
+            >
+              <span>View Case Study</span>
+              <ArrowUpRight className="size-3.5" />
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  ))}
+</div>
+
+<script>
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  const initCardStacking = () => {
+    const cards = document.querySelectorAll<HTMLElement>(".work-stack-card");
+    if (!cards.length) return;
+
+    cards.forEach((card, index) => {
+      // For all cards except the last, seamlessly fade out as the next card stacks over it
+      if (index < cards.length - 1) {
+        const nextCard = cards[index + 1];
+
+        gsap.to(card, {
+          scale: 0.94,
+          opacity: 0,
+          ease: "none",
+          scrollTrigger: {
+            trigger: nextCard,
+            start: "top 85%",
+            end: "top 25%",
+            scrub: true,
+          },
+        });
+      }
+    });
+  };
+
+  document.addEventListener("astro:page-load", initCardStacking);
+</script>

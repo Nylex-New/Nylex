@@ -1,0 +1,36 @@
+@font-face {
+  font-family: "raleway";
+  src: url("../assets/fonts/Raleway-Light.ttf");
+  font-weight: 300;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "raleway";
+  src: url("../assets/fonts/Raleway-Regular.ttf");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "raleway";
+  src: url("../assets/fonts/Raleway-Medium.ttf");
+  font-weight: 500;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "raleway";
+  src: url("../assets/fonts/Raleway-SemiBold.ttf");
+  font-weight: 600;
+  font-style: normal;
+  font-display: block;
+}
+
+/** Tailwind config */
+@theme {
+  --font-primary: "raleway";
+}

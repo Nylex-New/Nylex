@@ -1,0 +1,26 @@
+/* Scrollable container */
+.scroll-container {
+  overflow: auto;
+  scrollbar-gutter: stable;
+}
+
+/* Scrollbar size */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 2px;
+}
+
+/* Scrollbar track */
+::-webkit-scrollbar-track {
+  background-color: #0a0a0a;
+}
+
+/* Scrollbar thumb */
+::-webkit-scrollbar-thumb {
+  background-color: #aa0101;
+}
+
+/* Scrollbar thumb on hover */
+::-webkit-scrollbar-thumb:hover {
+  background-color: #51497c;
+}

@@ -1,0 +1,73 @@
+[
+  {
+    "id": "01",
+    "slug": "inkjector-tattoos",
+    "title": "Inkjector Tattoos",
+    "category": "Web Development",
+    "description": "Premium website for a leading tattoo studio with modern UI and booking experience.",
+    "website": "https://www.inkjectortattoos.com",
+    "displayUrl": "www.inkjectortattoos.com",
+    "img": "/images/projects/inkjector.png",
+    "layout": {
+      "width": "48%",
+      "height": "460px"
+    }
+  },
+  {
+    "id": "02",
+    "slug": "amazink-tattoo",
+    "title": "Amazink Tattoo",
+    "category": "Web Development",
+    "description": "Bold, elegant and high-performance website for a luxury tattoo studio.",
+    "website": "https://www.amazinktattoo.com",
+    "displayUrl": "www.amazinktattoo.com",
+    "img": "/images/projects/amazink.png",
+    "layout": {
+      "width": "48%",
+      "height": "460px"
+    }
+  },
+  {
+    "id": "03",
+    "slug": "taste-of-malabar",
+    "title": "Taste of Malabar",
+    "category": "Web Development",
+    "description": "Catering & event management website with modern design and seamless user experience.",
+    "website": "https://www.tasteofmalabarcaterers.com",
+    "displayUrl": "www.tasteofmalabarcaterers.com",
+    "img": "/images/projects/taste_of_malabar.png",
+    "layout": {
+      "width": "100%",
+      "height": "540px"
+    }
+  },
+  {
+    "id": "04",
+    "slug": "vanyaa-rainforest-retreat",
+    "title": "Vanyaa Rainforest Retreat",
+    "category": "Web Application",
+    "description": "A luxury resort website built to showcase nature, comfort and unforgettable experiences.",
+    "website": "https://resort-ashy.vercel.app",
+    "displayUrl": "resort-ashy.vercel.app",
+    "img": "/images/projects/vanyaa.png",
+    "layout": {
+      "width": "48%",
+      "height": "460px"
+    }
+  },
+  {
+    "id": "05",
+    "slug": "technova-solutions",
+    "title": "TechNova Solutions",
+    "category": "Web Application",
+    "description": "Technology and IT solutions website designed for a modern digital company.",
+    "website": "https://ai-powered-e-commerce-website-sable.vercel.app",
+    "displayUrl": "ai-powered-e-commerce-website-sable.vercel.app",
+    "img": "/images/projects/swift_cart.png",
+    "layout": {
+      "width": "48%",
+      "height": "460px"
+    }
+  }
+]
+

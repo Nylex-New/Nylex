@@ -1,0 +1,34 @@
+{
+  "email": {
+    "address": "buildwithnylex@gmail.com",
+    "href": "mailto:buildwithnylex@gmail.com"
+  },
+  "phone": {
+    "display": "+91 89214 42748",
+    "href": "tel:+918921442748"
+  },
+  "whatsapp": {
+    "number": "+918921442748",
+    "href": "https://wa.me/918921442748"
+  },
+  "location": "Kozhikode, Kerala, India",
+  "socials": [
+    {
+      "label": "WhatsApp",
+      "href": "https://wa.me/918921442748"
+    },
+    {
+      "label": "Instagram",
+      "href": "https://instagram.com/nylexstudio"
+    },
+    {
+      "label": "LinkedIn",
+      "href": "https://linkedin.com/company/nylex"
+    },
+    {
+      "label": "GitHub",
+      "href": "https://github.com"
+    }
+  ]
+}
+

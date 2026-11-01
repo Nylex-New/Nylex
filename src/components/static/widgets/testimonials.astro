@@ -1,0 +1,248 @@
+---
+import { ArrowUpRight } from "lucide-react";
+
+const reviews = [
+  {
+    index: "01",
+    author: "Arjun R.",
+    role: "Founder",
+    company: "Inkjector Tattoos",
+    quote:
+      "Nylex Studio elevated our digital presence to international standards. The modern UI and streamlined booking experience increased our client bookings by 140% within the very first month.",
+    metric: "+140% Inquiries",
+    engagement: "Brand & Platform Architecture",
+    year: "2025",
+  },
+  {
+    index: "02",
+    author: "Rahul K.",
+    role: "Creative Director",
+    company: "Amazink Tattoo Studio",
+    quote:
+      "High-performance engineering combined with bold visual aesthetics. The website loads in milliseconds and perfectly reflects the luxury atmosphere of our studio.",
+    metric: "Sub-Second Load",
+    engagement: "Design System & Web App",
+    year: "2025",
+  },
+  {
+    index: "03",
+    author: "Farhan M.",
+    role: "Managing Director",
+    company: "Taste of Malabar Caterers",
+    quote:
+      "Our catering and event inquiries doubled within weeks of launch. The platform is blazing fast, user-friendly, and receives praise from our corporate clients daily.",
+    metric: "2X Lead Volume",
+    engagement: "Corporate Platform & CMS",
+    year: "2025",
+  },
+  {
+    index: "04",
+    author: "Dr. Sneha V.",
+    role: "Director",
+    company: "Vanyaa Rainforest Retreat",
+    quote:
+      "A breathtaking digital experience that truly captures the peace and serenity of our luxury resort. Nylex's engineering standards and attention to visual perfection are world-class.",
+    metric: "Award-Grade UI",
+    engagement: "Hospitality Web Experience",
+    year: "2026",
+  },
+];
+---
+
+<!-- Outer Container with Native GSAP Pinning -->
+<section
+  id="reviews-pin-section"
+  class="relative w-full border-t border-neutral-200 bg-white text-neutral-950 overflow-hidden"
+>
+  <!-- Fullscreen Viewport Window (Pinned by GSAP) -->
+  <div id="reviews-viewport" class="w-full h-screen flex flex-col justify-between pt-16 pb-4 sm:pt-20 sm:pb-6 overflow-hidden bg-white text-neutral-950">
+    
+    <!-- Top Header & Live Scroll Progress -->
+    <div class="w-full max-w-7xl mx-auto px-6 md:px-12 flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-3 sm:pb-4 border-b border-neutral-200 shrink-0">
+      <div>
+        <div class="flex items-center gap-2.5 font-mono text-xs uppercase tracking-[0.25em] text-[#0052FF] font-semibold mb-2">
+          <span class="w-2 h-2 rounded-full bg-[#0052FF]"></span>
+          <span>CLIENT REVIEWS &bull; VERIFIED PARTNERS</span>
+        </div>
+        <h2 class="text-2xl sm:text-4xl lg:text-5xl font-bold uppercase tracking-tight leading-none text-neutral-950">
+          Proven Impact &amp; Trust
+        </h2>
+      </div>
+
+      <!-- Live Counter & Progress Bar -->
+      <div class="flex items-center gap-5 font-mono text-xs shrink-0">
+        <span class="text-neutral-500 uppercase tracking-widest hidden sm:inline-block">Scroll to advance</span>
+        <div class="w-32 h-1.5 rounded-full bg-neutral-200 overflow-hidden relative">
+          <div id="reviews-progress-bar" class="h-full bg-[#0052FF] w-0 transition-all duration-100 ease-out"></div>
+        </div>
+        <span id="reviews-counter" class="text-[#0052FF] font-bold text-sm tracking-wider">01 / 04</span>
+      </div>
+    </div>
+
+    <!-- Center Horizontal Track (Translates to the Left on Vertical Scroll) -->
+    <div id="reviews-track-container" class="my-auto w-full overflow-hidden px-6 md:px-12 py-2 sm:py-3 flex items-center">
+      <div
+        id="reviews-horizontal-track"
+        class="flex flex-nowrap items-center gap-6 md:gap-10 will-change-transform shrink-0"
+      >
+        {reviews.map((r) => (
+          <div
+            class="review-horizontal-card w-[86vw] sm:w-[72vw] md:w-[62vw] lg:w-[54vw] max-w-3xl shrink-0 p-6 sm:p-8 md:p-10 rounded-2xl sm:rounded-3xl border border-neutral-200 bg-neutral-50/70 hover:bg-white flex flex-col justify-between relative transition-all hover:border-[#0052FF]/40 shadow-xs"
+          >
+            <!-- Card Header: Metric & Metadata -->
+            <div class="flex items-center justify-between pb-4 border-b border-neutral-200/80">
+              <span class="font-mono text-xs font-semibold px-3.5 py-1.5 rounded-full border border-[#0052FF]/30 text-[#0052FF] uppercase tracking-wider bg-[#0052FF]/5">
+                {r.metric}
+              </span>
+              <div class="flex items-center gap-3 font-mono text-xs text-neutral-400 uppercase tracking-widest">
+                <span>INDEX {r.index}</span>
+                <span>&bull;</span>
+                <span>{r.year}</span>
+              </div>
+            </div>
+
+            <!-- Card Quote (Large, Refined Editorial Typography) -->
+            <div class="my-4 sm:my-6">
+              <p class="text-base sm:text-lg md:text-xl lg:text-2xl font-light leading-snug tracking-tight text-neutral-900">
+                &ldquo;{r.quote}&rdquo;
+              </p>
+            </div>
+
+            <!-- Card Author & Verified Info -->
+            <div class="pt-4 border-t border-neutral-200/80 flex items-end justify-between gap-4">
+              <div>
+                <h4 class="text-base sm:text-lg font-bold uppercase tracking-tight text-neutral-950">
+                  {r.author}
+                </h4>
+                <p class="font-mono text-xs text-neutral-500 mt-0.5">
+                  {r.role} &bull; <span class="text-neutral-700 font-medium">{r.company}</span>
+                </p>
+              </div>
+              <span class="font-mono text-[11px] uppercase tracking-widest text-[#0052FF] font-medium hidden sm:inline-block">
+                {r.engagement}
+              </span>
+            </div>
+          </div>
+        ))}
+
+        <!-- Ending Invitation Card -->
+        <div
+          class="review-horizontal-card w-[86vw] sm:w-[72vw] md:w-[62vw] lg:w-[54vw] max-w-3xl shrink-0 p-6 sm:p-8 md:p-10 rounded-2xl sm:rounded-3xl border border-[#0052FF]/30 bg-[#0052FF]/[0.03] flex flex-col justify-between relative"
+        >
+          <div class="flex items-center justify-between pb-4 border-b border-[#0052FF]/20">
+            <span class="font-mono text-xs font-semibold px-3.5 py-1.5 rounded-full bg-[#0052FF] text-white uppercase tracking-wider">
+              Next Success Story
+            </span>
+            <span class="font-mono text-xs text-neutral-500 uppercase tracking-widest">
+              2026 &bull; Available
+            </span>
+          </div>
+
+          <div class="my-4 sm:my-6">
+            <h3 class="text-2xl sm:text-3xl lg:text-4xl font-bold uppercase tracking-tight leading-tight text-neutral-950">
+              Ready to elevate your digital presence?
+            </h3>
+            <p class="text-sm sm:text-base text-neutral-600 font-light leading-relaxed mt-2 sm:mt-3 max-w-xl">
+              Partner with Nylex Studio to engineer high-performance platforms that drive verified client impact.
+            </p>
+          </div>
+
+          <div class="pt-4 border-t border-[#0052FF]/20 flex items-center justify-between">
+            <a
+              href="#contact"
+              class="inline-flex items-center gap-2 px-6 sm:px-8 py-3 rounded-full bg-[#0052FF] hover:bg-[#2563EB] text-white font-mono text-xs uppercase tracking-widest transition-all"
+            >
+              <span>Initiate Project</span>
+              <ArrowUpRight className="size-4" />
+            </a>
+            <span class="font-mono text-xs text-neutral-500 uppercase tracking-widest hidden sm:inline-block">
+              24H SLA Guaranteed
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Status Bar -->
+    <div class="w-full max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between font-mono text-xs text-neutral-500 pt-3 border-t border-neutral-200 shrink-0">
+      <span>100% Verified Production Engagements</span>
+      <span class="text-[#0052FF] font-medium hidden sm:inline-block">Scroll down to traverse reviews &rarr;</span>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  let activeAnim: gsap.core.Tween | null = null;
+
+  const initHorizontalReviews = () => {
+    const pinSection = document.getElementById("reviews-pin-section");
+    const track = document.getElementById("reviews-horizontal-track");
+    const container = document.getElementById("reviews-track-container");
+    const progressBar = document.getElementById("reviews-progress-bar");
+    const counter = document.getElementById("reviews-counter");
+    if (!pinSection || !track) return;
+
+    if (activeAnim) {
+      activeAnim.kill();
+      activeAnim = null;
+    }
+
+    // Exact scroll distance from right edge of track to left edge of container
+    const getScrollDist = () => {
+      const containerWidth = container ? container.clientWidth : window.innerWidth;
+      const totalWidth = track.scrollWidth;
+      return Math.max(0, totalWidth - containerWidth + 60);
+    };
+
+    activeAnim = gsap.to(track, {
+      x: () => -getScrollDist(),
+      ease: "none",
+      scrollTrigger: {
+        trigger: pinSection,
+        start: "top top",
+        end: () => `+=${Math.max(1400, getScrollDist() * 1.1)}`,
+        pin: true,
+        scrub: 0.8,
+        invalidateOnRefresh: true,
+        anticipatePin: 1,
+        onUpdate: (self) => {
+          if (progressBar) {
+            progressBar.style.width = `${Math.min(100, Math.max(0, self.progress * 100))}%`;
+          }
+          if (counter) {
+            const total = 4;
+            const current = Math.min(
+              total,
+              Math.max(1, Math.floor(self.progress * (total - 0.05)) + 1)
+            );
+            counter.textContent = `0${current} / 0${total}`;
+          }
+        },
+      },
+    });
+
+    ScrollTrigger.refresh();
+
+    // Cleanup on Astro view transition
+    document.addEventListener(
+      "astro:before-swap",
+      () => {
+        if (activeAnim) {
+          activeAnim.kill();
+          activeAnim = null;
+        }
+      },
+      { once: true }
+    );
+  };
+
+  document.addEventListener("astro:page-load", initHorizontalReviews);
+  if (document.readyState === "complete" || document.readyState === "interactive") {
+    initHorizontalReviews();
+  }
+</script>

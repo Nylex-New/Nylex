@@ -1,0 +1,393 @@
+---
+// NYLEX Studio — interactive floating robot agent
+---
+
+<aside
+  id="floating-agent-container"
+  aria-label="Interactive 3D Robot Agent"
+  class="fixed right-3 sm:right-6 bottom-3 sm:bottom-6 z-40 flex flex-col items-center pointer-events-none select-none opacity-0 translate-y-4 transition-all duration-700"
+>
+  <div class="relative flex h-52 w-48 items-center justify-center sm:h-60 sm:w-56 drop-shadow-[0_16px_36px_rgba(0,163,255,0.35)]">
+    <canvas id="vanilla-agent-canvas" class="h-full w-full" aria-hidden="true"></canvas>
+  </div>
+</aside>
+
+<script>
+  import * as THREE from 'three';
+
+  type AgentRuntime = { dispose: () => void };
+  let activeRuntime: AgentRuntime | undefined;
+
+  const initRobotAgent = () => {
+    const container = document.getElementById('floating-agent-container');
+    const canvas = document.getElementById('vanilla-agent-canvas') as HTMLCanvasElement | null;
+    if (!container || !canvas) return;
+
+    // Keep WebGL off phones and touch-first devices to protect battery and frame time.
+    if (window.innerWidth < 768 || window.matchMedia('(pointer: coarse)').matches) {
+      container.remove();
+      return;
+    }
+    activeRuntime?.dispose();
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera( thirtyFov(), 1, 0.1, 100 );
+    camera.position.set(0, 0.08, 7.6);
+
+    let renderer: THREE.WebGLRenderer;
+    try {
+      renderer = new THREE.WebGLRenderer({
+        canvas,
+        alpha: true,
+        antialias: true,
+        powerPreference: 'high-performance',
+        stencil: false,
+        depth: true,
+      });
+    } catch {
+      container.remove();
+      return;
+    }
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setSize(canvas.clientWidth || 224, canvas.clientHeight || 240, false);
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.35;
+
+    scene.add(new THREE.HemisphereLight(0xeaf7ff, 0x24344e, 2.0));
+    const key = new THREE.DirectionalLight(0xffffff, 3.2);
+    key.position.set(-3.5, 5, 6);
+    scene.add(key);
+    const cyanFill = new THREE.PointLight(0x00bfff, 18, 8, 2);
+    cyanFill.position.set(2.5, 1.2, 3);
+    scene.add(cyanFill);
+    const rim = new THREE.DirectionalLight(0x37cfff, 2.2);
+    rim.position.set(3, 1, -4);
+    scene.add(rim);
+
+    const ceramic = new THREE.MeshStandardMaterial({ color: 0xf2f7fc, roughness: 0.18, metalness: 0.2 });
+    const ceramicLight = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.12, metalness: 0.15 });
+    const ceramicShade = new THREE.MeshStandardMaterial({ color: 0xdde7f2, roughness: 0.22, metalness: 0.25 });
+    const dark = new THREE.MeshStandardMaterial({ color: 0x111a2b, roughness: 0.32, metalness: 0.82 });
+    const darkGloss = new THREE.MeshStandardMaterial({ color: 0x050b19, roughness: 0.055, metalness: 0.72 });
+    const cyan = new THREE.MeshStandardMaterial({ color: 0x00cfff, emissive: 0x00aaff, emissiveIntensity: 2.4, roughness: 0.12, metalness: 0.12 });
+    const cyanBright = new THREE.MeshBasicMaterial({ color: 0x00eaff });
+    const flameMat = new THREE.MeshBasicMaterial({ color: 0x00dfff, transparent: true, opacity: 0.78, depthWrite: false });
+    const haloMat = new THREE.MeshBasicMaterial({ color: 0x55dfff, transparent: true, opacity: 0.32, depthWrite: false });
+
+    const root = new THREE.Group();
+    scene.add(root);
+    const bodyGroup = new THREE.Group();
+    root.add(bodyGroup);
+    const headPivot = new THREE.Group();
+    headPivot.position.set(0, 0.64, 0);
+    root.add(headPivot);
+
+    const sphere = (parent: THREE.Object3D, material: THREE.Material, pos: [number, number, number], scale: [number, number, number], seg = 32) => {
+      const mesh = new THREE.Mesh(new THREE.SphereGeometry(1, seg, Math.max(16, Math.floor(seg * 0.75))), material);
+      mesh.position.set(...pos); mesh.scale.set(...scale); parent.add(mesh); return mesh;
+    };
+    const cylinder = (parent: THREE.Object3D, material: THREE.Material, rTop: number, rBottom: number, h: number, pos: [number, number, number], radial = 32) => {
+      const mesh = new THREE.Mesh(new THREE.CylinderGeometry(rTop, rBottom, h, radial), material);
+      mesh.position.set(...pos); parent.add(mesh); return mesh;
+    };
+    const torus = (parent: THREE.Object3D, material: THREE.Material, radius: number, tube: number, pos: [number, number, number], rot: [number, number, number] = [0, 0, 0]) => {
+      const mesh = new THREE.Mesh(new THREE.TorusGeometry(radius, tube, 12, 64), material);
+      mesh.position.set(...pos); mesh.rotation.set(...rot); parent.add(mesh); return mesh;
+    };
+
+    // HEAD: Clean, pure glossy white helmet with sleek, well-proportioned dimensions (no gray backside)
+    sphere(headPivot, ceramicLight, [0, 0, 0], [0.96, 0.82, 0.65], 48);
+    sphere(headPivot, ceramic, [0, 0.02, 0.02], [0.94, 0.81, 0.65], 48);
+    // Crown shell panel and thin dark seam that arcs around it
+    const crown = sphere(headPivot, ceramicLight, [0, 0.42, 0.08], [0.58, 0.36, 0.52], 40);
+    crown.rotation.z = -0.035;
+    const crownSeam = torus(headPivot, dark, 0.62, 0.012, [0, 0.42, 0.04], [Math.PI / 2, 0, 0]);
+    crownSeam.scale.set(1.02, 0.7, 1);
+    // Forehead cyan light slot, set into a dark slim housing
+    const browHousing = sphere(headPivot, dark, [0, 0.29, 0.56], [0.4, 0.08, 0.05], 32);
+    browHousing.scale.z = 0.07;
+    const browLight = sphere(headPivot, cyan, [0, 0.28, 0.6], [0.36, 0.03, 0.022], 32);
+    // Visor bezel and glossy closed face panel
+    sphere(headPivot, dark, [0, -0.1, 0.52], [0.78, 0.54, 0.17], 48);
+    sphere(headPivot, darkGloss, [0, -0.095, 0.61], [0.72, 0.47, 0.095], 48);
+    // Subtle visor inner reflection
+    sphere(headPivot, new THREE.MeshBasicMaterial({ color: 0x0a2b55, transparent: true, opacity: 0.22 }), [0, -0.42, 0.64], [0.5, 0.07, 0.012], 32);
+
+    const eyes: THREE.Mesh[] = [];
+    for (const x of [-0.31, 0.31]) {
+      const eye = new THREE.Mesh(new THREE.CapsuleGeometry(0.08, 0.16, 8, 16), cyanBright);
+      eye.position.set(x, -0.08, 0.70);
+      eye.scale.set(0.85, 1, 0.45);
+      headPivot.add(eye); eyes.push(eye);
+      const glow = sphere(headPivot, new THREE.MeshBasicMaterial({ color: 0x00bfff, transparent: true, opacity: 0.17 }), [x, -0.08, 0.68], [0.14, 0.2, 0.025], 24);
+      glow.renderOrder = 1;
+    }
+
+    // Antenna: black socket + charcoal stem + luminous cyan spherical beacon
+    cylinder(headPivot, dark, 0.09, 0.11, 0.08, [0, 0.79, 0.02]);
+    cylinder(headPivot, dark, 0.048, 0.055, 0.24, [0, 0.94, 0.02], 24);
+    sphere(headPivot, dark, [0, 1.06, 0.02], [0.08, 0.03, 0.08], 24);
+    sphere(headPivot, cyan, [0, 1.18, 0.02], [0.125, 0.125, 0.125], 32);
+    sphere(headPivot, new THREE.MeshBasicMaterial({ color: 0xb9f7ff, transparent: true, opacity: 0.75 }), [-0.04, 1.22, 0.12], [0.03, 0.03, 0.016], 16);
+
+    // Ear / headphone sensor pods, symmetrical and concentric on both sides of the helmet.
+    for (const side of [-1, 1]) {
+      const ear = new THREE.Group();
+      ear.position.set(side * 0.91, -0.05, 0.0);
+      ear.rotation.y = side * 0.06;
+      headPivot.add(ear);
+
+      // Dark mounting socket flush with helmet
+      const socket = cylinder(ear, dark, 0.28, 0.28, 0.07, [side * 0.02, 0, 0], 32);
+      socket.rotation.z = Math.PI / 2;
+
+      // Outer ceramic headphone cup
+      const cup = cylinder(ear, ceramicLight, 0.29, 0.3, 0.09, [side * 0.07, 0, 0], 36);
+      cup.rotation.z = Math.PI / 2;
+
+      // Outer chamfered rim
+      torus(ear, ceramic, 0.29, 0.025, [side * 0.1, 0, 0], [0, Math.PI / 2, 0]);
+
+      // Concentric cyan neon glowing ring (centered on the ear face!)
+      torus(ear, cyan, 0.19, 0.024, [side * 0.11, 0, 0], [0, Math.PI / 2, 0]);
+
+      // Inner dark glossy acoustic center disc
+      const innerDisc = cylinder(ear, darkGloss, 0.15, 0.15, 0.035, [side * 0.115, 0, 0], 32);
+      innerDisc.rotation.z = Math.PI / 2;
+
+      // Subtle cyan center core
+      sphere(ear, cyan, [side * 0.12, 0, 0], [0.018, 0.04, 0.04], 20);
+    }
+
+    // Short dark neck collar — almost hidden under the large helmet.
+    cylinder(bodyGroup, dark, 0.29, 0.31, 0.17, [0, 0.12, 0]);
+    cylinder(bodyGroup, ceramicShade, 0.27, 0.29, 0.055, [0, 0.04, 0]);
+
+    // Compact tapered torso, visibly much smaller than the head.
+    const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.43, 0.34, 0.69, 40, 1), ceramic);
+    torso.position.set(0, -0.38, 0); torso.scale.z = 0.76; bodyGroup.add(torso);
+    sphere(bodyGroup, ceramicLight, [0, -0.35, 0.08], [0.43, 0.36, 0.34], 40);
+    // Chest dark inset and reactor ring, facing camera.
+    sphere(bodyGroup, dark, [0, -0.34, 0.335], [0.34, 0.34, 0.105], 36);
+    torus(bodyGroup, cyan, 0.205, 0.035, [0, -0.34, 0.43]);
+    torus(bodyGroup, new THREE.MeshBasicMaterial({ color: 0x47eaff, transparent: true, opacity: 0.8 }), 0.155, 0.012, [0, -0.34, 0.447]);
+    sphere(bodyGroup, darkGloss, [0, -0.34, 0.435], [0.135, 0.135, 0.045], 32);
+    sphere(bodyGroup, new THREE.MeshBasicMaterial({ color: 0x0a5b91, transparent: true, opacity: 0.55 }), [-0.035, -0.29, 0.47], [0.055, 0.055, 0.012], 20);
+
+    // Curved-looking cyan rib seams, built from short tapered glowing segments.
+    for (const side of [-1, 1]) {
+      const seam = new THREE.Mesh(new THREE.TorusGeometry(0.22, 0.018, 8, 32, Math.PI * 0.72), cyan);
+      seam.position.set(side * 0.31, -0.55, 0.29);
+      seam.rotation.set(0.08, side * -0.2, side * -0.62);
+      bodyGroup.add(seam);
+      const lowerPlate = sphere(bodyGroup, ceramicShade, [side * 0.22, -0.77, 0.03], [0.23, 0.12, 0.25], 28);
+      lowerPlate.rotation.z = side * -0.12;
+    }
+    // Waist / lower abdomen armor.
+    const abdomen = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.29, 0.25, 32), ceramicShade);
+    abdomen.position.set(0, -0.83, 0); abdomen.scale.z = 0.8; bodyGroup.add(abdomen);
+    sphere(bodyGroup, ceramicLight, [0, -0.84, 0.04], [0.31, 0.13, 0.25], 32);
+
+    // Arms: Sleek cybernetic limbs with compact, elegant robotic hands (delicate fingers, cyan accents)
+    const armPivots: THREE.Group[] = [];
+    for (const side of [-1, 1]) {
+      const shoulder = new THREE.Group();
+      shoulder.position.set(side * 0.44, -0.16, 0.04);
+      shoulder.rotation.set(0.12, side * -0.1, side * -0.28);
+      bodyGroup.add(shoulder);
+      armPivots.push(shoulder);
+
+      // Shoulder ball & ceramic armor cap
+      sphere(shoulder, dark, [0, 0, 0], [0.14, 0.14, 0.14], 24);
+      sphere(shoulder, ceramicLight, [side * 0.04, 0.02, 0.04], [0.16, 0.15, 0.16], 28);
+      // Shoulder cyan glowing accent ring
+      const shoulderAccent = torus(shoulder, cyan, 0.085, 0.014, [side * 0.05, 0.07, 0.08], [0.35, 0, 0]);
+      shoulderAccent.scale.set(1.2, 0.7, 1);
+
+      // Upper arm joint strut (dark sleek cybernetic rod)
+      const upperArm = cylinder(shoulder, dark, 0.065, 0.07, 0.18, [side * 0.1, -0.12, 0.04], 20);
+      upperArm.rotation.z = side * -0.42;
+
+      // Elbow joint
+      sphere(shoulder, dark, [side * 0.18, -0.24, 0.06], [0.075, 0.075, 0.075], 20);
+
+      // Forearm group: angled forward gracefully
+      const forearmGroup = new THREE.Group();
+      forearmGroup.position.set(side * 0.18, -0.24, 0.06);
+      forearmGroup.rotation.set(0.35, side * -0.25, side * -0.32);
+      shoulder.add(forearmGroup);
+
+      // Forearm ceramic shell (clean, tapered)
+      cylinder(forearmGroup, ceramic, 0.08, 0.065, 0.22, [0, -0.11, 0], 24);
+      sphere(forearmGroup, ceramicLight, [0, -0.1, 0.02], [0.085, 0.12, 0.075], 24);
+      // Wrist glowing cyan ring
+      torus(forearmGroup, cyan, 0.068, 0.012, [0, -0.2, 0], [Math.PI / 2, 0, 0]);
+
+      // Hand: Compact, sleek robotic hand (delicate cybernetic fingers)
+      sphere(forearmGroup, dark, [0, -0.22, 0], [0.05, 0.045, 0.05], 20);
+      // Compact dark palm
+      sphere(forearmGroup, dark, [0, -0.26, 0.015], [0.055, 0.05, 0.045], 20);
+      // Top ceramic hand back-plate
+      sphere(forearmGroup, ceramicLight, [0, -0.255, 0.03], [0.05, 0.045, 0.025], 20);
+
+      // Three delicate, curved fingers
+      for (let finger = 0; finger < 3; finger++) {
+        const angle = (finger - 1) * 0.26;
+        const fx = Math.sin(angle) * 0.032;
+        const fz = 0.015 + Math.cos(angle) * 0.01;
+        const fy = -0.29 - (finger === 1 ? 0.012 : 0);
+        
+        // Finger segment
+        const phalanx = cylinder(forearmGroup, dark, 0.014, 0.016, 0.045, [fx, fy, fz], 12);
+        phalanx.rotation.set(0.38, 0, angle * side);
+        
+        // Fingertip
+        sphere(forearmGroup, ceramicShade, [fx, fy - 0.032, fz + 0.015], [0.015, 0.018, 0.015], 16);
+      }
+      // Thumb
+      const thumb = cylinder(forearmGroup, dark, 0.013, 0.015, 0.038, [side * -0.035, -0.26, 0.025], 12);
+      thumb.rotation.set(0.2, side * -0.5, side * 0.4);
+      sphere(forearmGroup, ceramicShade, [side * -0.045, -0.285, 0.035], [0.015, 0.016, 0.015], 14);
+    }
+
+    // Twin propulsion units beneath the compact body.
+    const flames: THREE.Mesh[] = [];
+    for (const x of [-0.2, 0.2]) {
+      cylinder(bodyGroup, dark, 0.105, 0.13, 0.13, [x, -1.02, 0]);
+      torus(bodyGroup, ceramicLight, 0.105, 0.025, [x, -1.085, 0]);
+      const nozzle = cylinder(bodyGroup, dark, 0.075, 0.105, 0.12, [x, -1.13, 0], 24);
+      nozzle.rotation.x = Math.PI;
+      const flame = new THREE.Mesh(new THREE.ConeGeometry(0.105, 0.48, 24, 1), flameMat);
+      flame.position.set(x, -1.43, 0); flame.rotation.z = Math.PI; bodyGroup.add(flame); flames.push(flame);
+      const inner = new THREE.Mesh(new THREE.ConeGeometry(0.045, 0.3, 18), new THREE.MeshBasicMaterial({ color: 0x9af7ff, transparent: true, opacity: 0.75 }));
+      inner.position.set(x, -1.39, 0.015); inner.rotation.z = Math.PI; bodyGroup.add(inner);
+    }
+
+    // Waist orbital halo, tilted in perspective, plus four cyan motes.
+    const halo = torus(root, haloMat, 1.28, 0.018, [0, -0.38, -0.12], [Math.PI * 0.5 + 0.28, 0.05, -0.18]);
+    halo.scale.set(1.12, 0.72, 1);
+    const motes: THREE.Mesh[] = [];
+    for (let i = 0; i < 4; i++) {
+      const mote = new THREE.Mesh(new THREE.SphereGeometry(0.027, 12, 12), cyanBright);
+      scene.add(mote); motes.push(mote);
+    }
+
+    // Soft pool of cyan light beneath the jet flames.
+    const groundGlow = new THREE.Mesh(
+      new THREE.CircleGeometry(0.48, 48),
+      new THREE.MeshBasicMaterial({ color: 0x16cfff, transparent: true, opacity: 0.13, depthWrite: false })
+    );
+    groundGlow.rotation.x = -Math.PI / 2;
+    groundGlow.position.set(0, -1.94, 0.05); groundGlow.scale.set(1.5, 0.48, 1); scene.add(groundGlow);
+    const glowCore = new THREE.Mesh(new THREE.CircleGeometry(0.24, 40), new THREE.MeshBasicMaterial({ color: 0x75edff, transparent: true, opacity: 0.16, depthWrite: false }));
+    glowCore.rotation.x = -Math.PI / 2; glowCore.position.set(0, -1.935, 0.05); glowCore.scale.set(1.35, 0.38, 1); scene.add(glowCore);
+
+    const mouse = { targetYaw: 0, targetPitch: 0, yaw: 0, pitch: 0, eyeX: 0, eyeY: 0 };
+    const onPointerMove = (event: PointerEvent) => {
+      const rect = canvas.getBoundingClientRect();
+      const agentX = rect.left + rect.width / 2;
+      const agentY = rect.top + rect.height / 2;
+      const dx = event.clientX - agentX;
+      const dy = event.clientY - agentY;
+      const normX = dx / Math.max(window.innerWidth * 0.75, 450);
+      const normY = dy / Math.max(window.innerHeight * 0.75, 450);
+      mouse.targetYaw = THREE.MathUtils.clamp(normX * 1.6, -0.95, 0.95);
+      // Direct cursor pitch: when cursor is up (dy < 0), mouse.pitch is negative which tilts head up towards cursor
+      mouse.targetPitch = THREE.MathUtils.clamp(normY * 1.5, -0.72, 0.72);
+      mouse.eyeX = THREE.MathUtils.clamp(normX * 0.12, -0.1, 0.1);
+      mouse.eyeY = THREE.MathUtils.clamp(-normY * 0.08, -0.08, 0.08);
+    };
+    const onResize = () => {
+      const width = canvas.clientWidth || 224;
+      const height = canvas.clientHeight || 240;
+      camera.aspect = width / height; camera.updateProjectionMatrix();
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.setSize(width, height, false);
+    };
+
+    let raf = 0;
+    let disposed = false;
+    let visible = !document.hidden;
+    const clock = new THREE.Clock();
+    let lastBlink = 0;
+    let blinkStart = -10;
+    const onVisibility = () => {
+      visible = !document.hidden;
+      if (visible && !disposed) { clock.getDelta(); raf = requestAnimationFrame(animate); }
+      else cancelAnimationFrame(raf);
+    };
+
+    const animate = () => {
+      if (disposed || !visible) return;
+      raf = requestAnimationFrame(animate);
+      const elapsed = clock.getElapsedTime();
+      mouse.yaw = THREE.MathUtils.lerp(mouse.yaw, mouse.targetYaw, 0.095);
+      mouse.pitch = THREE.MathUtils.lerp(mouse.pitch, mouse.targetPitch, 0.095);
+      headPivot.rotation.y = mouse.yaw;
+      headPivot.rotation.x = mouse.pitch;
+      bodyGroup.rotation.y = THREE.MathUtils.lerp(bodyGroup.rotation.y, mouse.yaw * 0.38, 0.045);
+      bodyGroup.rotation.x = THREE.MathUtils.lerp(bodyGroup.rotation.x, mouse.pitch * 0.22, 0.045);
+      root.position.y = Math.sin(elapsed * 2.2) * 0.055;
+      root.rotation.z = Math.sin(elapsed * 1.8) * 0.018;
+      armPivots.forEach((arm, index) => { arm.rotation.z += Math.sin(elapsed * 1.7 + index * Math.PI) * 0.0009; });
+      eyes.forEach((eye) => { eye.position.x = (eye.position.x < 0 ? -0.31 : 0.31) + mouse.eyeX; eye.position.y = -0.08 + mouse.eyeY; });
+      // Natural quick blink every ~3–5 seconds.
+      if (elapsed - lastBlink > 3.4 + (Math.sin(elapsed * 0.71) + 1) * 0.8) { lastBlink = elapsed; blinkStart = elapsed; }
+      const blinkAge = elapsed - blinkStart;
+      const blinkScale = blinkAge >= 0 && blinkAge < 0.16 ? 1 - Math.sin((blinkAge / 0.16) * Math.PI) * 0.88 : 1;
+      eyes.forEach((eye) => { eye.scale.y = blinkScale; });
+      flames.forEach((flame, index) => {
+        const pulse = 1 + Math.sin(elapsed * 32 + index * 1.8) * 0.09;
+        flame.scale.set(pulse, 0.9 + pulse * 0.1, pulse);
+      });
+      halo.rotation.z += 0.0015;
+      motes.forEach((mote, index) => {
+        const angle = elapsed * 0.55 + (index / motes.length) * Math.PI * 2;
+        mote.position.set(Math.cos(angle) * 1.42, -0.38 + Math.sin(angle) * 0.48, -0.12 + Math.sin(angle * 1.4) * 0.08);
+      });
+      const reactorPulse = 1 + Math.sin(elapsed * 2.1) * 0.06;
+      bodyGroup.children.forEach((child) => {
+        if (child instanceof THREE.Mesh && child.geometry instanceof THREE.TorusGeometry && child.position.z > 0.4) child.scale.set(reactorPulse, reactorPulse, 1);
+      });
+      groundGlow.material.opacity = 0.11 + (Math.sin(elapsed * 2.2) + 1) * 0.025;
+      renderer.render(scene, camera);
+    };
+
+    const dispose = () => {
+      if (disposed) return;
+      disposed = true; visible = false;
+      cancelAnimationFrame(raf);
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('resize', onResize);
+      document.removeEventListener('visibilitychange', onVisibility);
+      document.removeEventListener('astro:before-swap', onBeforeSwap);
+      scene.traverse((object) => {
+        if (object instanceof THREE.Mesh) {
+          object.geometry.dispose();
+          const materials = Array.isArray(object.material) ? object.material : [object.material];
+          materials.forEach((material) => material.dispose());
+        }
+      });
+      renderer.dispose();
+      renderer.forceContextLoss();
+      if (activeRuntime?.dispose === dispose) activeRuntime = undefined;
+    };
+    const onBeforeSwap = () => dispose();
+
+    window.addEventListener('pointermove', onPointerMove, { passive: true });
+    window.addEventListener('resize', onResize, { passive: true });
+    document.addEventListener('visibilitychange', onVisibility);
+    document.addEventListener('astro:before-swap', onBeforeSwap);
+    onResize();
+    container.classList.remove('opacity-0', 'translate-y-4');
+    activeRuntime = { dispose };
+    if (visible) raf = requestAnimationFrame(animate);
+  };
+
+  function thirtyFov() { return 30; }
+
+  document.addEventListener('astro:page-load', initRobotAgent);
+  // Also support a script executed after the page-load event has already fired.
+  if (document.readyState === 'complete') initRobotAgent();
+</script>

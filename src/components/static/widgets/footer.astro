@@ -1,0 +1,56 @@
+---
+import Logo from "../ui/logo.astro";
+import contacts from "@/data/contacts.json";
+import { ArrowUp } from "lucide-react";
+---
+
+<footer class="w-full border-t border-neutral-800/80 py-12 px-6 md:px-12 lg:px-20 bg-[#05070f] text-neutral-300 relative z-20 transition-colors duration-500">
+  <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6 text-xs font-mono">
+    <!-- Brand -->
+    <div class="flex items-center gap-6">
+      <Logo showText={true} />
+      <span class="hidden sm:inline text-neutral-600">|</span>
+      <p class="hidden sm:inline text-neutral-400">
+        &copy; {new Date().getFullYear()} NYLEX STUDIO. All rights reserved.
+      </p>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="flex items-center gap-6 uppercase tracking-wider text-neutral-400">
+      <a href="#home" class="hover:text-[#0052FF] transition-colors">Home</a>
+      <a href="#works" class="hover:text-[#0052FF] transition-colors">Work</a>
+      <a href="#solutions" class="hover:text-[#0052FF] transition-colors">Solutions</a>
+      <a href="#about" class="hover:text-[#0052FF] transition-colors">About</a>
+      <a href="#contact" class="hover:text-[#0052FF] transition-colors">Contact</a>
+    </div>
+
+    <!-- Direct Reach & Back to Top -->
+    <div class="flex items-center gap-5">
+      <a
+        href={contacts.email.href}
+        class="text-neutral-400 hover:text-[#0052FF] transition-colors"
+      >
+        {contacts.email.address}
+      </a>
+      <button
+        id="back-to-top"
+        type="button"
+        aria-label="Back to top"
+        class="p-2.5 rounded-full border border-neutral-700/80 hover:border-[#0052FF] hover:bg-[#0052FF] text-neutral-300 hover:text-white transition-all cursor-pointer"
+      >
+        <ArrowUp className="size-3.5" />
+      </button>
+    </div>
+  </div>
+
+  <p class="sm:hidden text-center text-neutral-500 text-[11px] mt-6 font-mono">
+    &copy; {new Date().getFullYear()} NYLEX STUDIO. All rights reserved.
+  </p>
+</footer>
+
+<script>
+  const backToTopBtn = document.getElementById("back-to-top");
+  backToTopBtn?.addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+</script>

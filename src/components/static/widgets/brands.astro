@@ -1,0 +1,52 @@
+---
+const brands = [
+  { name: "INKJECTOR TATTOOS", domain: "inkjectortattoos.com" },
+  { name: "AMAZINK STUDIO", domain: "amazinktattoo.com" },
+  { name: "TASTE OF MALABAR", domain: "tasteofmalabarcaterers.com" },
+  { name: "VANYAA RETREAT", domain: "resort-ashy.vercel.app" },
+  { name: "TECHNOVA SOLUTIONS", domain: "technova.io" },
+  { name: "SIXTH SENSE TECH", domain: "sixthsense.in" },
+  { name: "EVERMARK STUDIO", domain: "evermarktattoo.com" },
+  { name: "GALAXY MARBLE", domain: "galaxymarble.com" },
+];
+---
+
+<section class="w-full py-16 border-y border-neutral-200 relative overflow-hidden bg-neutral-50/60 text-neutral-950">
+  <div class="max-w-7xl mx-auto px-6 md:px-12 mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div class="flex items-center gap-2.5 font-mono text-xs uppercase tracking-[0.25em] text-[#0052FF] font-semibold">
+      <span class="w-2 h-2 rounded-full bg-[#0052FF]"></span>
+      <span>TRUSTED BY CLIENTS & PARTNERS</span>
+    </div>
+    <span class="font-mono text-xs text-neutral-500">High-Growth Startups & Luxury Studios</span>
+  </div>
+
+  <!-- Smooth Brand Marquee -->
+  <div class="w-full overflow-hidden select-none py-2 relative">
+    <div class="flex items-center gap-12 whitespace-nowrap animate-brand-marquee">
+      {[...brands, ...brands, ...brands].map((brand) => (
+        <div class="group flex items-center gap-12 font-mono text-base sm:text-xl font-bold uppercase tracking-widest text-neutral-700 hover:text-[#0052FF] transition-all cursor-default">
+          <span class="border border-neutral-200 px-5 py-2.5 rounded-xl bg-white group-hover:border-[#0052FF] group-hover:text-[#0052FF] transition-all">
+            {brand.name}
+          </span>
+          <span class="w-1.5 h-1.5 rounded-full bg-[#0052FF]"></span>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  @keyframes brandMarquee {
+    0% { transform: translateX(0%); }
+    100% { transform: translateX(-50%); }
+  }
+  .animate-brand-marquee {
+    display: inline-flex;
+    animation: brandMarquee 30s linear infinite;
+    will-change: transform;
+  }
+  .animate-brand-marquee:hover {
+    animation-play-state: paused;
+  }
+</style>
+

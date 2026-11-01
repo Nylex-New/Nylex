@@ -1,0 +1,41 @@
+---
+import { cn } from "@/lib/utils/cn";
+
+interface Props {
+  class?: string;
+  overlayClass?: string;
+}
+
+const { class: className, overlayClass } = Astro.props;
+---
+
+<span
+  class:list={cn([
+        "reveal-heading relative overflow-hidden inline-block pb-2 px-2",
+        className,
+    ])}
+>
+  <slot />
+  <span
+    class:list={cn([
+            "overlay absolute top-[-50%] left-[-10%] w-[120%] h-[200%] bg-background -rotate-6 z-10",
+            overlayClass,
+        ])}
+  ></span>
+</span>
+
+<script>
+import { gsap } from "gsap";
+
+document.addEventListener("astro:page-load", () => {
+  const overlays = document.querySelectorAll(".reveal-heading .overlay");
+  if (!overlays.length) return;
+
+  gsap.set(overlays, { yPercent: 0 });
+  gsap.to(overlays, {
+    yPercent: 100,
+    duration: 2.2,
+    ease: "power3.inOut",
+  });
+});
+</script>

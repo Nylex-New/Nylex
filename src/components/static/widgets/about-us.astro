@@ -1,0 +1,149 @@
+---
+import { ArrowUpRight, Compass, Users, Zap, Clock, ShieldCheck, Trophy, Sparkles } from "lucide-react";
+
+const introStatement =
+  "Nylex is a team of passionate designers, developers, and problem solvers. We combine creativity with technology to build digital solutions that drive real results. We believe in visual perfection, robust engineering, and close collaboration.";
+
+const words = introStatement.split(" ");
+const wordsWithChars = words.map((word, wIdx) => {
+  const chars = word.split("").map((char, cIdx) => ({
+    id: `char-${wIdx}-${cIdx}`,
+    char,
+  }));
+  return { id: `word-${wIdx}`, word, chars };
+});
+
+const pillars = [
+  {
+    icon: Compass,
+    title: "Creative Approach",
+    description:
+      "We blend creativity with strategy to build stunning, memorable digital experiences that set new benchmarks.",
+    badge: "Design Innovation",
+  },
+  {
+    icon: Users,
+    title: "Client Focused",
+    description:
+      "We listen, collaborate, and deliver bespoke solutions that truly align with your goals and make a real business impact.",
+    badge: "Close Partnership",
+  },
+  {
+    icon: Zap,
+    title: "Quality & Performance",
+    description:
+      "We build fast, secure, and scalable solutions that grow alongside your business and deliver top Lighthouse grades.",
+    badge: "Zero-Lag Standards",
+  },
+  {
+    icon: Clock,
+    title: "On-Time Delivery",
+    description:
+      "We respect your timelines, plan exhaustively, and maintain rigorous execution pipelines to deploy on schedule.",
+    badge: "Guaranteed Cadence",
+  },
+];
+---
+
+<section
+  id="about"
+  class="w-full py-24 md:py-36 px-6 md:px-12 lg:px-20 border-t border-neutral-200 relative overflow-hidden bg-white text-neutral-950"
+>
+  <!-- Section Title -->
+  <div class="mb-12">
+    <div class="flex items-center gap-3 font-mono text-xs uppercase tracking-[0.25em] text-[#0052FF] font-semibold mb-4">
+      <span class="w-2 h-2 rounded-full bg-[#0052FF]"></span>
+      <span>ABOUT US</span>
+    </div>
+    <h2 class="text-4xl sm:text-6xl lg:text-7xl font-bold uppercase tracking-tight text-neutral-950">
+      We’re More Than a Studio
+    </h2>
+  </div>
+
+  <!-- Pinned / Dynamic Scroll-Driven Character Reveal -->
+  <div id="about-pin-container" class="my-12 py-8">
+    <p id="about-scrub-text" class="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-light leading-snug tracking-tight max-w-6xl text-neutral-950">
+      {wordsWithChars.map((w) => (
+        <span class="inline-block mr-[0.25em]">
+          {w.chars.map((c) => (
+            <span class="about-char opacity-20 transition-opacity">{c.char}</span>
+          ))}
+        </span>
+      ))}
+    </p>
+
+    <!-- More About Us Button -->
+    <div class="mt-12 flex items-center gap-4">
+      <a
+        href="#contact"
+        id="more-about-btn"
+        class="group inline-flex items-center gap-3 px-8 py-4 rounded-full border border-neutral-300 hover:border-[#0052FF] bg-neutral-100 hover:bg-[#0052FF] text-neutral-900 hover:text-white font-semibold text-base transition-all"
+      >
+        <span>More About Us</span>
+        <ArrowUpRight className="size-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+      </a>
+      <span class="text-xs font-mono text-neutral-500 hidden sm:inline">
+        Headquartered in Kozhikode &bull; Serving Global Brands
+      </span>
+    </div>
+  </div>
+
+  <!-- 4 Pillars Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 mt-20">
+    {pillars.map((pillar, idx) => (
+      <div class="pillar-card group p-8 sm:p-10 rounded-2xl border border-neutral-200 bg-neutral-50/70 hover:bg-white hover:border-[#0052FF]/50 transition-all flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-8">
+            <div class="p-3.5 rounded-xl border border-neutral-200 bg-white group-hover:scale-110 transition-transform">
+              <pillar.icon className="size-6 text-[#0052FF]" />
+            </div>
+            <span class="font-mono text-xs uppercase px-3 py-1 rounded-full bg-neutral-100 border border-neutral-200 text-neutral-600">
+              {pillar.badge}
+            </span>
+          </div>
+
+          <h3 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight text-neutral-950 group-hover:text-[#0052FF] transition-colors">
+            {pillar.title}
+          </h3>
+          <p class="text-base sm:text-lg text-neutral-600 mt-4 leading-relaxed font-light">
+            {pillar.description}
+          </p>
+        </div>
+
+        <div class="pt-8 border-t border-neutral-200 mt-8 flex items-center justify-between text-xs font-mono text-neutral-400 group-hover:text-neutral-700 transition-colors">
+          <span>PILLAR 0{idx + 1}</span>
+          <span class="w-12 h-[1px] bg-neutral-300"></span>
+        </div>
+      </div>
+    ))}
+  </div>
+</section>
+
+<script>
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+  import { applyScrollReveal } from "@/lib/animations";
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  document.addEventListener("astro:page-load", () => {
+    applyScrollReveal(".pillar-card");
+
+    // Character-by-character scrub reveal on scroll
+    const chars = document.querySelectorAll("#about-scrub-text .about-char");
+    if (chars.length) {
+      gsap.set(chars, { opacity: 0.2 });
+      gsap.to(chars, {
+        opacity: 1,
+        stagger: 0.05,
+        scrollTrigger: {
+          trigger: "#about-pin-container",
+          start: "top 75%",
+          end: "bottom 35%",
+          scrub: 0.5,
+        },
+      });
+    }
+  });
+</script>
+

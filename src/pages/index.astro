@@ -1,0 +1,51 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Navbar from "@/components/static/widgets/nav.astro";
+import Hero from "@/components/static/widgets/hero.astro";
+import Brands from "@/components/static/widgets/brands.astro";
+import DigitalSolutions from "@/components/static/widgets/digital-solutions.astro";
+import Works from "@/components/static/widgets/works.astro";
+import Testimonials from "@/components/static/widgets/testimonials.astro";
+import AboutUs from "@/components/static/widgets/about-us.astro";
+import Contact from "@/components/static/widgets/contact.astro";
+import Footer from "@/components/static/widgets/footer.astro";
+import FloatingAgent from "@/components/static/widgets/floating-agent.astro";
+---
+
+<Layout
+  title="NYLEX STUDIO — Building Premium Digital Experiences"
+  description="Nylex is a creative digital studio crafting premium websites, brands, and digital products that help modern businesses establish authority and scale."
+>
+  <Navbar />
+  <main class="w-full relative overflow-x-clip">
+    <!-- 1. Hero Section with Quantum Matrix (Dark Theme) -->
+    <Hero />
+
+    <!-- White Theme Sections: From WHAT WE DO all the way down to Contact (Smoothly illuminated by body scroll transition) -->
+    <div id="white-theme-wrapper" class="w-full bg-transparent text-neutral-950 relative z-10">
+      <!-- 2. Digital Solutions (What We Do - Architectural Minimalist Monolith) -->
+      <DigitalSolutions />
+
+      <!-- 3. Our Work (Stacking Cards: Square Photo, Name, Description, Link Button) -->
+      <Works />
+
+      <!-- 4. Brand Showcase (Trusted by Clients & Partners - Placed Above Reviews) -->
+      <Brands />
+
+      <!-- 5. Client Reviews (Redesigned Editorial Horizontal Scroll - Zero Shadows) -->
+      <Testimonials />
+
+      <!-- 6. About Us (Story & Value Pillars) -->
+      <AboutUs />
+
+      <!-- 7. Contact (Architectural Precision Form - Zero Shadows) -->
+      <Contact />
+    </div>
+
+    <!-- 8. Minimal Compact Footer (Dark Theme) -->
+    <Footer />
+  </main>
+
+  <!-- 3D Vanilla Floating Agent in Bottom-Right (Cursor-Tracking, Zero React Overhead) -->
+  <FloatingAgent />
+</Layout>

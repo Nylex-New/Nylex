@@ -1,0 +1,37 @@
+@import "./tailwind.css";
+@import "./scrollbar.css";
+/* @import "./debug.css"; */
+
+html {
+  scrollbar-gutter: stable;
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.logo-mask {
+  transform: translateZ(0);
+}
+
+.image-no-pointer-events {
+  pointer-events: none;
+}
+
+.ink-cursor {
+  mix-blend-mode: exclusion;
+}
+
+.contact-confirmation-circle {
+  stroke-dasharray: 151;
+  stroke-dashoffset: 151;
+}
+
+.contact-confirmation-check {
+  stroke-dasharray: 36;
+  stroke-dashoffset: 36;
+}
