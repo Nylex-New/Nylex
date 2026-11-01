@@ -10,6 +10,7 @@ import AboutUs from "@/components/static/widgets/about-us.astro";
 import Contact from "@/components/static/widgets/contact.astro";
 import Footer from "@/components/static/widgets/footer.astro";
 import FloatingAgent from "@/components/static/widgets/floating-agent.astro";
+import { AgentChat } from "@/components/react/widgets/agent-chat";
 ---
 
 <Layout
@@ -48,4 +49,7 @@ import FloatingAgent from "@/components/static/widgets/floating-agent.astro";
 
   <!-- 3D Vanilla Floating Agent in Bottom-Right (Cursor-Tracking, Zero React Overhead) -->
   <FloatingAgent />
+
+  <!-- Nylex Studio Intelligence Agent Chat Interface (Click-triggered or Mobile-triggered) -->
+  <AgentChat client:load />
 </Layout>

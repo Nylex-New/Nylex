@@ -7,7 +7,16 @@
   aria-label="Interactive 3D Robot Agent"
   class="fixed right-3 sm:right-6 bottom-3 sm:bottom-6 z-40 flex flex-col items-center pointer-events-none select-none opacity-0 translate-y-4 transition-all duration-700"
 >
-  <div class="relative flex h-52 w-48 items-center justify-center sm:h-60 sm:w-56 drop-shadow-[0_16px_36px_rgba(0,163,255,0.35)]">
+  <div
+    id="vanilla-agent-wrapper"
+    class="relative flex h-52 w-48 items-center justify-center sm:h-60 sm:w-56 drop-shadow-[0_16px_36px_rgba(0,163,255,0.35)] pointer-events-auto cursor-pointer group"
+    role="button"
+    tabindex="0"
+    title="Click to chat with Nylex Agent"
+    aria-label="Chat with Nylex Studio AI Agent"
+  >
+
+
     <canvas id="vanilla-agent-canvas" class="h-full w-full" aria-hidden="true"></canvas>
   </div>
 </aside>
@@ -54,7 +63,7 @@
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.35;
 
-    scene.add(new THREE.HemisphereLight(0xeaf7ff, 0x24344e, 2.0));
+    scene.add(new THREE.HemisphereLight(0xffffff, 0xe2eef8, 2.2));
     const key = new THREE.DirectionalLight(0xffffff, 3.2);
     key.position.set(-3.5, 5, 6);
     scene.add(key);
@@ -64,10 +73,14 @@
     const rim = new THREE.DirectionalLight(0x37cfff, 2.2);
     rim.position.set(3, 1, -4);
     scene.add(rim);
+    // Back fill light to eliminate any dark / gray shadows on back of helmet
+    const backFill = new THREE.DirectionalLight(0xffffff, 2.0);
+    backFill.position.set(0, 2.5, -5.5);
+    scene.add(backFill);
 
-    const ceramic = new THREE.MeshStandardMaterial({ color: 0xf2f7fc, roughness: 0.18, metalness: 0.2 });
-    const ceramicLight = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.12, metalness: 0.15 });
-    const ceramicShade = new THREE.MeshStandardMaterial({ color: 0xdde7f2, roughness: 0.22, metalness: 0.25 });
+    const ceramic = new THREE.MeshStandardMaterial({ color: 0xf4f8fc, roughness: 0.16, metalness: 0.18 });
+    const ceramicLight = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.10, metalness: 0.12 });
+    const ceramicShade = new THREE.MeshStandardMaterial({ color: 0xe5eef7, roughness: 0.20, metalness: 0.20 });
     const dark = new THREE.MeshStandardMaterial({ color: 0x111a2b, roughness: 0.32, metalness: 0.82 });
     const darkGloss = new THREE.MeshStandardMaterial({ color: 0x050b19, roughness: 0.055, metalness: 0.72 });
     const cyan = new THREE.MeshStandardMaterial({ color: 0x00cfff, emissive: 0x00aaff, emissiveIntensity: 2.4, roughness: 0.12, metalness: 0.12 });
@@ -97,8 +110,8 @@
     };
 
     // HEAD: Clean, pure glossy white helmet with sleek, well-proportioned dimensions (no gray backside)
-    sphere(headPivot, ceramicLight, [0, 0, 0], [0.96, 0.82, 0.65], 48);
-    sphere(headPivot, ceramic, [0, 0.02, 0.02], [0.94, 0.81, 0.65], 48);
+    sphere(headPivot, ceramicLight, [0, 0, 0], [0.90, 0.77, 0.62], 48);
+    sphere(headPivot, ceramic, [0, 0.02, 0.02], [0.88, 0.76, 0.62], 48);
     // Crown shell panel and thin dark seam that arcs around it
     const crown = sphere(headPivot, ceramicLight, [0, 0.42, 0.08], [0.58, 0.36, 0.52], 40);
     crown.rotation.z = -0.035;
@@ -312,6 +325,34 @@
     const clock = new THREE.Clock();
     let lastBlink = 0;
     let blinkStart = -10;
+    let hopOffset = 0;
+    let hopVelocity = 0;
+
+    const triggerHop = () => {
+      hopVelocity = 0.35;
+      lastBlink = clock.getElapsedTime();
+      blinkStart = lastBlink;
+    };
+
+    const wrapper = document.getElementById('vanilla-agent-wrapper');
+    const handleTriggerClick = (e: Event) => {
+      e.stopPropagation();
+      triggerHop();
+      window.dispatchEvent(new CustomEvent('toggle-agent-chat'));
+    };
+
+    const handleKeydown = (e: KeyboardEvent) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        handleTriggerClick(e);
+      }
+    };
+
+    if (wrapper) {
+      wrapper.addEventListener('click', handleTriggerClick);
+      wrapper.addEventListener('keydown', handleKeydown as EventListener);
+    }
+
     const onVisibility = () => {
       visible = !document.hidden;
       if (visible && !disposed) { clock.getDelta(); raf = requestAnimationFrame(animate); }
@@ -322,13 +363,24 @@
       if (disposed || !visible) return;
       raf = requestAnimationFrame(animate);
       const elapsed = clock.getElapsedTime();
+
+      // Hop physics on click
+      if (hopVelocity !== 0 || hopOffset > 0) {
+        hopOffset += hopVelocity;
+        hopVelocity -= 0.024;
+        if (hopOffset <= 0) {
+          hopOffset = 0;
+          hopVelocity = 0;
+        }
+      }
+
       mouse.yaw = THREE.MathUtils.lerp(mouse.yaw, mouse.targetYaw, 0.095);
       mouse.pitch = THREE.MathUtils.lerp(mouse.pitch, mouse.targetPitch, 0.095);
       headPivot.rotation.y = mouse.yaw;
       headPivot.rotation.x = mouse.pitch;
       bodyGroup.rotation.y = THREE.MathUtils.lerp(bodyGroup.rotation.y, mouse.yaw * 0.38, 0.045);
       bodyGroup.rotation.x = THREE.MathUtils.lerp(bodyGroup.rotation.x, mouse.pitch * 0.22, 0.045);
-      root.position.y = Math.sin(elapsed * 2.2) * 0.055;
+      root.position.y = Math.sin(elapsed * 2.2) * 0.055 + hopOffset;
       root.rotation.z = Math.sin(elapsed * 1.8) * 0.018;
       armPivots.forEach((arm, index) => { arm.rotation.z += Math.sin(elapsed * 1.7 + index * Math.PI) * 0.0009; });
       eyes.forEach((eye) => { eye.position.x = (eye.position.x < 0 ? -0.31 : 0.31) + mouse.eyeX; eye.position.y = -0.08 + mouse.eyeY; });
@@ -358,6 +410,10 @@
       if (disposed) return;
       disposed = true; visible = false;
       cancelAnimationFrame(raf);
+      if (wrapper) {
+        wrapper.removeEventListener('click', handleTriggerClick);
+        wrapper.removeEventListener('keydown', handleKeydown as EventListener);
+      }
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('resize', onResize);
       document.removeEventListener('visibilitychange', onVisibility);
