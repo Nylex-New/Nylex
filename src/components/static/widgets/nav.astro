@@ -149,25 +149,36 @@ import { ArrowUpRight } from "lucide-react";
     });
   });
 
-  // Dynamic light/dark theme detector based on scroll position over white wrapper
+  // Zero-reflow dynamic light/dark theme detector via IntersectionObserver (Zero scroll listeners)
   const mainNav = document.getElementById("main-nav");
   const whiteWrapper = document.getElementById("white-theme-wrapper");
 
-  const updateNavTheme = () => {
-    if (!mainNav || !whiteWrapper) return;
-    const rect = whiteWrapper.getBoundingClientRect();
-    const navHeight = 65;
-    if (rect.top <= navHeight && rect.bottom >= navHeight) {
-      mainNav.classList.add("is-light-nav");
-    } else {
-      mainNav.classList.remove("is-light-nav");
-    }
-  };
+  if (whiteWrapper && mainNav) {
+    const navObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            mainNav.classList.add("is-light-nav");
+          } else {
+            mainNav.classList.remove("is-light-nav");
+          }
+        });
+      },
+      {
+        rootMargin: "-65px 0px 0px 0px",
+        threshold: 0,
+      }
+    );
+    navObserver.observe(whiteWrapper);
 
-  window.addEventListener("scroll", updateNavTheme, { passive: true });
-  window.addEventListener("resize", updateNavTheme);
-  document.addEventListener("astro:page-load", updateNavTheme);
-  updateNavTheme();
+    document.addEventListener(
+      "astro:before-swap",
+      () => {
+        navObserver.disconnect();
+      },
+      { once: true }
+    );
+  }
 </script>
 
 <style>

@@ -12,18 +12,18 @@ const { works = worksData } = Astro.props;
 <div id="works-stack-container" class="relative w-full flex flex-col gap-12 md:gap-16 my-4 pb-20">
   {works.map((work, idx) => (
     <div
-      class="work-stack-card sticky top-20 sm:top-24 md:top-28 w-full max-w-6xl mx-auto p-4 sm:p-6 md:p-8 bg-transparent border-none overflow-hidden transition-transform will-change-transform"
+      class="work-stack-card sticky top-16 sm:top-20 md:top-24 w-full max-w-7xl mx-auto p-4 sm:p-6 md:p-8 bg-transparent border-none overflow-hidden transition-transform will-change-transform"
       style={`z-index: ${10 + idx};`}
       data-card-index={idx}
     >
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-        <!-- 1. Wide Project Photo (Preserves Full Aspect Ratio, Zero Left/Right Cut-Off) -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center">
+        <!-- 1. Expanded High-Impact Project Photo (Larger Size, Full Aspect Ratio, Zero Cut-Off) -->
         <div class="lg:col-span-7 w-full flex justify-center lg:justify-start">
           <a
             href={work.website}
             target="_blank"
             rel="noopener noreferrer"
-            class="block w-full max-w-[640px] aspect-[1024/489] overflow-hidden bg-neutral-100 relative group cursor-pointer border border-neutral-200/80 shadow-xs"
+            class="block w-full max-w-[760px] aspect-[1024/489] overflow-hidden bg-neutral-100 relative group cursor-pointer border border-neutral-200/90 shadow-md transition-all duration-300 hover:border-[#0052FF]/50"
           >
             <img
               src={work.img}
@@ -34,8 +34,8 @@ const { works = worksData } = Astro.props;
           </a>
         </div>
 
-        <!-- 2. Name & 3. Description & 4. Link Button (Compact, Fits in Single Screen, Transparent Card) -->
-        <div class="lg:col-span-5 flex flex-col justify-center gap-3 sm:gap-4 md:gap-5">
+        <!-- 2. Name & 3. Description & 4. Link Button (Larger Architectural Typography) -->
+        <div class="lg:col-span-5 flex flex-col justify-center gap-3 sm:gap-4 md:gap-6">
           <!-- Counter Badge -->
           <div class="flex items-center gap-2.5 font-mono text-xs text-neutral-500 uppercase tracking-widest">
             <span>PROJECT 0{idx + 1} / 0{works.length}</span>
@@ -43,13 +43,13 @@ const { works = worksData } = Astro.props;
             <span>{work.category}</span>
           </div>
 
-          <!-- Project Name -->
-          <h3 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold uppercase tracking-tight leading-tight text-neutral-950">
+          <!-- Project Name (Bolder & Larger) -->
+          <h3 class="text-3xl sm:text-5xl md:text-6xl font-bold uppercase tracking-tight leading-[1.05] text-neutral-950">
             {work.title}
           </h3>
 
           <!-- Project Description -->
-          <p class="text-sm sm:text-base text-neutral-600 font-light leading-relaxed max-w-lg">
+          <p class="text-base sm:text-lg text-neutral-600 font-light leading-relaxed max-w-xl">
             {work.description}
           </p>
 
@@ -59,10 +59,10 @@ const { works = worksData } = Astro.props;
               href={work.website}
               target="_blank"
               rel="noopener noreferrer"
-              class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#0052FF] hover:bg-[#2563EB] text-white font-mono text-xs uppercase tracking-widest transition-all w-fit shadow-xs"
+              class="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-full bg-[#0052FF] hover:bg-[#2563EB] text-white font-mono text-xs uppercase tracking-widest transition-all w-fit shadow-sm hover:scale-105 active:scale-95"
             >
               <span>View Case Study</span>
-              <ArrowUpRight className="size-3.5" />
+              <ArrowUpRight className="size-4" />
             </a>
           </div>
         </div>

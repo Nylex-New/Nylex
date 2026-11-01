@@ -8,22 +8,6 @@ const { className = "", showText = true } = Astro.props;
 ---
 
 <div class={`flex items-center gap-3.5 select-none ${className}`}>
-  <!-- Official Nylex Logo Mark -->
-  <div class="relative w-9 h-9 rounded-xl overflow-hidden border border-[#0052FF]/30 bg-black flex items-center justify-center shadow-[0_0_15px_rgba(0,82,255,0.2)]">
-    <img
-      src="/nylex-official-logo.jpg"
-      alt="Nylex Studio Logo"
-      class="w-full h-full object-cover scale-150"
-      onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
-    />
-    <!-- SVG Vector Fallback -->
-    <svg class="hidden w-5 h-5" viewBox="0 0 100 100" fill="none">
-      <path d="M20 20 L45 20 L45 80 L20 80 Z" fill="#0A0F1D" />
-      <path d="M25 25 L80 80 L60 80 L20 40 Z" fill="#0052FF" />
-      <path d="M55 20 L80 20 L80 80 L55 80 Z" fill="#0052FF" />
-    </svg>
-  </div>
-
   {showText && (
     <div class="flex flex-col">
       <span class="font-bold tracking-[0.25em] text-lg md:text-xl uppercase font-mono leading-none">

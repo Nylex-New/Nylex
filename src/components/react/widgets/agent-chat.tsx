@@ -1,13 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import {
-  MessageSquare,
   Send,
   X,
   RotateCcw,
   Sparkles,
   ArrowUpRight,
   Bot,
-  ChevronRight,
   CheckCircle2,
 } from "lucide-react";
 
@@ -408,7 +406,7 @@ export const AgentChat: React.FC = () => {
       {isOpen && (
         <aside
           aria-label="Nylex Studio AI Assistant"
-          className="fixed bottom-4 sm:bottom-28 right-3 sm:right-6 z-50 w-[calc(100vw-1.5rem)] sm:w-[430px] max-h-[85vh] sm:max-h-[640px] flex flex-col rounded-3xl overflow-hidden bg-[#090b14]/95 border border-neutral-800/80 shadow-[0_24px_80px_rgba(0,82,255,0.22)] backdrop-blur-2xl text-neutral-100 transition-all duration-300 animate-in fade-in slide-in-from-bottom-6"
+          className="fixed bottom-3 sm:bottom-20 right-2 sm:right-4 z-50 w-[calc(100vw-1rem)] sm:w-[420px] max-h-[85vh] sm:max-h-[620px] flex flex-col rounded-3xl overflow-hidden bg-[#090b14]/95 border border-neutral-800/80 shadow-[0_24px_80px_rgba(0,82,255,0.22)] backdrop-blur-2xl text-neutral-100 transition-all duration-300 animate-in fade-in slide-in-from-bottom-6"
         >
           {/* Header Bar */}
           <div className="flex items-center justify-between px-5 py-3.5 bg-neutral-950/80 border-b border-neutral-800/80 shrink-0">

@@ -156,7 +156,8 @@ export default function HeroBackground() {
     const resize = () => {
       width = window.innerWidth;
       height = window.innerHeight;
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      // Technique 7: Clamp DPR to 1.5 for optimal fragment shader fill rate
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       canvas.width = width * dpr;
       canvas.height = height * dpr;
       canvas.style.width = `${width}px`;
@@ -179,14 +180,11 @@ export default function HeroBackground() {
     window.addEventListener("pointermove", onPointerMove, { passive: true });
 
     let animId = 0;
+    let isRunning = false;
     const startTime = performance.now();
 
     const render = () => {
-      if (!inView) {
-        // Pause render loop when scrolled away from Hero to save battery & GPU
-        animId = requestAnimationFrame(render);
-        return;
-      }
+      if (!isRunning) return;
 
       // Smooth mouse lerp
       currentX += (targetX - currentX) * 0.08;
@@ -197,7 +195,7 @@ export default function HeroBackground() {
       gl.enableVertexAttribArray(aPos);
       gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
 
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       gl.uniform2f(uRes, width * dpr, height * dpr);
       gl.uniform2f(uMouse, currentX * dpr, currentY * dpr);
       gl.uniform1f(uTime, (performance.now() - startTime) / 1000.0);
@@ -207,9 +205,14 @@ export default function HeroBackground() {
       animId = requestAnimationFrame(render);
     };
 
-    animId = requestAnimationFrame(render);
+    // Technique 2: Conditional Frameloop Freezing (0% GPU when out of view)
+    if (inView) {
+      isRunning = true;
+      animId = requestAnimationFrame(render);
+    }
 
     return () => {
+      isRunning = false;
       cancelAnimationFrame(animId);
       window.removeEventListener("resize", resize);
       window.removeEventListener("pointermove", onPointerMove);

@@ -1,34 +1,44 @@
 ---
-const brands = [
-  { name: "INKJECTOR TATTOOS", domain: "inkjectortattoos.com" },
-  { name: "AMAZINK STUDIO", domain: "amazinktattoo.com" },
-  { name: "TASTE OF MALABAR", domain: "tasteofmalabarcaterers.com" },
-  { name: "VANYAA RETREAT", domain: "resort-ashy.vercel.app" },
-  { name: "TECHNOVA SOLUTIONS", domain: "technova.io" },
-  { name: "SIXTH SENSE TECH", domain: "sixthsense.in" },
-  { name: "EVERMARK STUDIO", domain: "evermarktattoo.com" },
-  { name: "GALAXY MARBLE", domain: "galaxymarble.com" },
+// TRUSTED BY CLIENTS & PARTNERS — Pure Logos, Zero Card Borders, Infinite 60 FPS CSS Marquee
+const brandLogos = [
+  { name: "Amazink Tattoo Studio", logo: "/logo/amazink.png" },
+  { name: "Taste of Malabar", logo: "/logo/taste-of-malabar.png" },
+  { name: "Crown E", logo: "/logo/crown-e.png" },
+  { name: "Defense Security", logo: "/logo/defense.png" },
+  { name: "Galaxy Granites", logo: "/logo/galaxy-granites.png" },
+  { name: "Modern", logo: "/logo/modern.png" },
+  { name: "Techsmart Systems", logo: "/logo/techsmart.png" },
+  { name: "Zeus Automations", logo: "/logo/zeus.png" },
 ];
 ---
 
-<section class="w-full py-16 border-y border-neutral-200 relative overflow-hidden bg-neutral-50/60 text-neutral-950">
+<section
+  id="brands"
+  class="w-full py-14 sm:py-18 border-y border-neutral-200/80 relative overflow-hidden bg-neutral-50/50 text-neutral-950 contain-paint"
+>
   <div class="max-w-7xl mx-auto px-6 md:px-12 mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
     <div class="flex items-center gap-2.5 font-mono text-xs uppercase tracking-[0.25em] text-[#0052FF] font-semibold">
       <span class="w-2 h-2 rounded-full bg-[#0052FF]"></span>
-      <span>TRUSTED BY CLIENTS & PARTNERS</span>
+      <span>TRUSTED BY CLIENTS &amp; PARTNERS</span>
     </div>
-    <span class="font-mono text-xs text-neutral-500">High-Growth Startups & Luxury Studios</span>
+
   </div>
 
-  <!-- Smooth Brand Marquee -->
-  <div class="w-full overflow-hidden select-none py-2 relative">
-    <div class="flex items-center gap-12 whitespace-nowrap animate-brand-marquee">
-      {[...brands, ...brands, ...brands].map((brand) => (
-        <div class="group flex items-center gap-12 font-mono text-base sm:text-xl font-bold uppercase tracking-widest text-neutral-700 hover:text-[#0052FF] transition-all cursor-default">
-          <span class="border border-neutral-200 px-5 py-2.5 rounded-xl bg-white group-hover:border-[#0052FF] group-hover:text-[#0052FF] transition-all">
-            {brand.name}
-          </span>
-          <span class="w-1.5 h-1.5 rounded-full bg-[#0052FF]"></span>
+  <!-- Ultra-Smooth Infinite Hardware-Accelerated Logo Marquee (Zero Borders, Pure Clean Logos) -->
+  <div class="w-full overflow-hidden select-none py-3 relative">
+    <!-- Gradient Fade Masks on Edges -->
+    <div class="pointer-events-none absolute left-0 top-0 bottom-0 w-16 sm:w-28 bg-gradient-to-r from-neutral-50/80 to-transparent z-10"></div>
+    <div class="pointer-events-none absolute right-0 top-0 bottom-0 w-16 sm:w-28 bg-gradient-to-l from-neutral-50/80 to-transparent z-10"></div>
+
+    <div class="flex items-center gap-12 sm:gap-20 whitespace-nowrap animate-logo-marquee will-change-transform">
+      {[...brandLogos, ...brandLogos].map((brand) => (
+        <div class="flex items-center justify-center shrink-0 px-4 sm:px-8 py-2 group cursor-pointer">
+          <img
+            src={brand.logo}
+            alt={brand.name}
+            class="h-9 sm:h-12 md:h-14 w-auto max-w-[150px] sm:max-w-[190px] object-contain opacity-85 group-hover:opacity-100 group-hover:scale-105 transition-all duration-300 filter contrast-125"
+            loading="lazy"
+          />
         </div>
       ))}
     </div>
@@ -36,17 +46,24 @@ const brands = [
 </section>
 
 <style>
-  @keyframes brandMarquee {
-    0% { transform: translateX(0%); }
-    100% { transform: translateX(-50%); }
+  @keyframes logoMarquee {
+    0% {
+      transform: translate3d(0, 0, 0);
+    }
+    100% {
+      transform: translate3d(-50%, 0, 0);
+    }
   }
-  .animate-brand-marquee {
+
+  .animate-logo-marquee {
     display: inline-flex;
-    animation: brandMarquee 30s linear infinite;
-    will-change: transform;
+    animation: logoMarquee 28s linear infinite;
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    perspective: 1000px;
   }
-  .animate-brand-marquee:hover {
+
+  .animate-logo-marquee:hover {
     animation-play-state: paused;
   }
 </style>
-

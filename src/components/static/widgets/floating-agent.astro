@@ -5,11 +5,11 @@
 <aside
   id="floating-agent-container"
   aria-label="Interactive 3D Robot Agent"
-  class="fixed right-3 sm:right-6 bottom-3 sm:bottom-6 z-40 flex flex-col items-center pointer-events-none select-none opacity-0 translate-y-4 transition-all duration-700"
+  class="fixed right-0 sm:right-1 bottom-0 sm:bottom-1 z-40 flex flex-col items-center pointer-events-none select-none opacity-0 translate-y-4 transition-all duration-700 contain-paint"
 >
   <div
     id="vanilla-agent-wrapper"
-    class="relative flex h-52 w-48 items-center justify-center sm:h-60 sm:w-56 drop-shadow-[0_16px_36px_rgba(0,163,255,0.35)] pointer-events-auto cursor-pointer group"
+    class="relative flex h-36 w-32 sm:h-44 sm:w-40 items-center justify-center drop-shadow-[0_12px_28px_rgba(0,163,255,0.3)] pointer-events-auto cursor-pointer group"
     role="button"
     tabindex="0"
     title="Click to chat with Nylex Agent"
@@ -41,7 +41,7 @@
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera( thirtyFov(), 1, 0.1, 100 );
-    camera.position.set(0, 0.08, 7.6);
+    camera.position.set(0, 0.05, 8.2);
 
     let renderer: THREE.WebGLRenderer;
     try {
@@ -57,8 +57,9 @@
       container.remove();
       return;
     }
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-    renderer.setSize(canvas.clientWidth || 224, canvas.clientHeight || 240, false);
+    // Technique 7: Clamp DPR to 1.5 for maximum GPU fragment shader efficiency
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+    renderer.setSize(canvas.clientWidth || 170, canvas.clientHeight || 190, false);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.35;
@@ -89,6 +90,7 @@
     const haloMat = new THREE.MeshBasicMaterial({ color: 0x55dfff, transparent: true, opacity: 0.32, depthWrite: false });
 
     const root = new THREE.Group();
+    root.scale.set(0.82, 0.82, 0.82);
     scene.add(root);
     const bodyGroup = new THREE.Group();
     root.add(bodyGroup);
@@ -297,12 +299,13 @@
     glowCore.rotation.x = -Math.PI / 2; glowCore.position.set(0, -1.935, 0.05); glowCore.scale.set(1.35, 0.38, 1); scene.add(glowCore);
 
     const mouse = { targetYaw: 0, targetPitch: 0, yaw: 0, pitch: 0, eyeX: 0, eyeY: 0 };
+    let cachedCenterX = window.innerWidth - 70;
+    let cachedCenterY = window.innerHeight - 70;
+
     const onPointerMove = (event: PointerEvent) => {
-      const rect = canvas.getBoundingClientRect();
-      const agentX = rect.left + rect.width / 2;
-      const agentY = rect.top + rect.height / 2;
-      const dx = event.clientX - agentX;
-      const dy = event.clientY - agentY;
+      // Technique 5: Pure arithmetic with cached metrics — ZERO forced reflows at 120 FPS
+      const dx = event.clientX - cachedCenterX;
+      const dy = event.clientY - cachedCenterY;
       const normX = dx / Math.max(window.innerWidth * 0.75, 450);
       const normY = dy / Math.max(window.innerHeight * 0.75, 450);
       mouse.targetYaw = THREE.MathUtils.clamp(normX * 1.6, -0.95, 0.95);
@@ -311,12 +314,18 @@
       mouse.eyeX = THREE.MathUtils.clamp(normX * 0.12, -0.1, 0.1);
       mouse.eyeY = THREE.MathUtils.clamp(-normY * 0.08, -0.08, 0.08);
     };
+
     const onResize = () => {
-      const width = canvas.clientWidth || 224;
-      const height = canvas.clientHeight || 240;
+      const width = canvas.clientWidth || 170;
+      const height = canvas.clientHeight || 190;
       camera.aspect = width / height; camera.updateProjectionMatrix();
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
       renderer.setSize(width, height, false);
+
+      // Cache center position on resize only
+      const rect = canvas.getBoundingClientRect();
+      cachedCenterX = rect.left + rect.width / 2;
+      cachedCenterY = rect.top + rect.height / 2;
     };
 
     let raf = 0;
